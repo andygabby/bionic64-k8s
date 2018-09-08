@@ -1,0 +1,3 @@
+.vagrant
+config/kube-join.sh
+*.log
