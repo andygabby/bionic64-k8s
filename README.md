@@ -17,7 +17,7 @@ Multiple master setup has not been tested.
 
 Add/remove nodes by adding entries to config/servers.yaml. You MUST have node in the hostname and use 10.4.2.x for it to work without modifications.
 
-CPU and memory can be modified by adding them to the server.yaml:
+CPU and memory can be modified by adding them to the config/servers.yaml:
 ```
 k8s-node1:
   ip: 10.4.2.11
