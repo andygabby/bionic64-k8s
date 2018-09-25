@@ -1,14 +1,15 @@
-# Vagrant up kubernetes cluster using ubuntu/bionic64 and kubeadm
-This will spin up a multi-node kubernetes cluster on ubuntu 18.04.
+# Vagrant up kubernetes cluster using Ubuntu 18.04 and kubeadm
+This will spin up a multi-node kubernetes cluster on Ubuntu 18.04.
 It uses https://github.com/cloudnativelabs/kube-router for the pod network.
 
 ## Requirements:
-- vagrant
-- virtualbox
-( Tested to work with fedora 28 as base OS )
+- vagrant + vagrant-sshfs
+- libvirt
 
 ## Usage:
 ```
+vagrant plugin install vagrant-sshfs
+vagrant up k8s-master1
 vagrant up
 ```
 A vagrant up with spin up a new cluster. Default behavior is 1 master and 4 nodes.
@@ -23,7 +24,7 @@ k8s-node1:
   ip: 10.4.2.11
   cpu: 4
   mem: 2048
-``` 
+```
 (Future update will add extra disk support)
 
 ### Once your cluster is running you can login to k8s-master and run kubectl as root:
@@ -45,13 +46,13 @@ kubectl get nodes -o wide
 ### Useful kubernetes commands.
 Spin up single use fedora or busybox container for troubleshooting and testing.
 ```
+kubectl get nodes -o wide
 kubectl run -it fedora --image=fedora --restart=Never -- bash
 kubectl run -it busybox --image=busybox --restart=Never -- sh
 kubectl delete pod fedora
 kubectl delete pod busybox
-``` 
+```
 Check status of all pods (including system)
 ```
 kubectl get pods --all-namespaces
 ```
-

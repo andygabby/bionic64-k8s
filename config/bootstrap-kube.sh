@@ -26,6 +26,9 @@ hostnameMatches() {
   return $?
 }
 
+# Prevent swap error messages from stopping the provisioning
+swapoff -a
+
 # TODO: Make work with multiple masters.
 if hostnameMatches master1; then
   # TODO: dynamically pull k8s-master1 address instead of hard coded.
