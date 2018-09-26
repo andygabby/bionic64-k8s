@@ -3,20 +3,20 @@
 # TODO: Support dynamic ip ranges so 10.4 doesnt need to be hard coded.
 LEAD_OCTETS=10.4
 SERVER_IP=$(ip -f inet -o addr show | grep ${LEAD_OCTETS} | awk '{split($4,a,"/");print a[1]}')
-apt-get install -y apt-transport-https
+apt install -y apt-transport-https
 
 # We are using 18.04 (bionic) but there is not currently a repo for it. Use xenial for now.
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
 deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
-apt-get update
+apt update
 
 # https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
 # Install docker if you don't have it already.
-apt-get install -y docker.io
-# Install k8s packages
-apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+apt install -y docker.io jq
+# Install k8s packages. kubelet will fail to start on the nodes until the master is configured.
+apt install -y kubelet kubeadm kubectl kubernetes-cni || true
 echo "KUBELET_EXTRA_ARGS=--node-ip=${SERVER_IP}" > /etc/default/kubelet
 systemctl enable docker
 systemctl start docker
@@ -25,6 +25,9 @@ hostnameMatches() {
   hostname | grep $1 > /dev/null
   return $?
 }
+
+# Prevent swap error messages from stopping the provisioning
+swapoff -a
 
 # TODO: Make work with multiple masters.
 if hostnameMatches master1; then
@@ -40,5 +43,10 @@ if hostnameMatches master1; then
 fi
 
 if hostnameMatches node; then
+  while [ ! -f /vagrant/config/kube-join.sh ]; do
+    echo "Kubernetes master is not yet ready"
+    sleep 1
+  done
+  echo "Kubernetes master is ready. Proceeding to join the cluster."
   sh /vagrant/config/kube-join.sh
 fi
