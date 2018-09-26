@@ -3,14 +3,14 @@
 # TODO: Support dynamic ip ranges so 10.4 doesnt need to be hard coded.
 LEAD_OCTETS=10.4
 SERVER_IP=$(ip -f inet -o addr show | grep ${LEAD_OCTETS} | awk '{split($4,a,"/");print a[1]}')
-apt-get install -y apt-transport-https
+apt install -y apt-transport-https
 
 # We are using 18.04 (bionic) but there is not currently a repo for it. Use xenial for now.
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
 deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
-apt-get update
+apt update
 
 # https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
 # Install docker if you don't have it already.
