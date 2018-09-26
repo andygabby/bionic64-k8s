@@ -4,12 +4,11 @@ It uses https://github.com/cloudnativelabs/kube-router for the pod network.
 
 ## Requirements:
 - vagrant + vagrant-sshfs
-- libvirt
+- libvirt or virtualbox
 
 ## Usage:
 ```
 vagrant plugin install vagrant-sshfs
-vagrant up k8s-master1
 vagrant up
 ```
 A vagrant up with spin up a new cluster. Default behavior is 1 master and 4 nodes.
@@ -46,13 +45,16 @@ kubectl get nodes -o wide
 ### Useful kubernetes commands.
 Spin up single use fedora or busybox container for troubleshooting and testing.
 ```
-kubectl get nodes -o wide
+kubectl get pods -o wide --sort-by="{.spec.nodeName}"
 kubectl run -it fedora --image=fedora --restart=Never -- bash
 kubectl run -it busybox --image=busybox --restart=Never -- sh
 kubectl delete pod fedora
 kubectl delete pod busybox
 ```
+
 Check status of all pods (including system)
 ```
-kubectl get pods --all-namespaces
+kubectl get pods --all-namespaces --include-uninitialized
 ```
+
+For more kubectl commands, check out the [cheat sheet!](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)

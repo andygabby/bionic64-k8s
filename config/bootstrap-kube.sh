@@ -14,9 +14,9 @@ apt-get update
 
 # https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
 # Install docker if you don't have it already.
-apt-get install -y docker.io
-# Install k8s packages
-apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+apt install -y docker.io jq
+# Install k8s packages. kubelet will fail to start on the nodes until the master is configured.
+apt install -y kubelet kubeadm kubectl kubernetes-cni || true
 echo "KUBELET_EXTRA_ARGS=--node-ip=${SERVER_IP}" > /etc/default/kubelet
 systemctl enable docker
 systemctl start docker
@@ -43,5 +43,10 @@ if hostnameMatches master1; then
 fi
 
 if hostnameMatches node; then
+  while [ ! -f /vagrant/config/kube-join.sh ]; do
+    echo "Kubernetes master is not yet ready"
+    sleep 1
+  done
+  echo "Kubernetes master is ready. Proceeding to join the cluster."
   sh /vagrant/config/kube-join.sh
 fi

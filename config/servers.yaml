@@ -9,4 +9,3 @@ vagrant:
     ip: 10.4.2.13
   k8s-node4:
     ip: 10.4.2.14
-
