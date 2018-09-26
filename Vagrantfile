@@ -14,7 +14,6 @@ Vagrant.configure("2") do |config|
 
   servers['vagrant'].each do |name, server|
     config.vm.define name do |host|
-      config.vm.synced_folder ".", "/vagrant", type: "sshfs"
       host.vm.hostname = name
       host.vm.network :private_network, ip: server["ip"]
     end
