@@ -7,5 +7,5 @@ vagrant:
     ip: 10.4.2.12
   k8s-node3:
     ip: 10.4.2.13
-  k8s-node4:
-    ip: 10.4.2.14
+#  k8s-node4:
+#    ip: 10.4.2.14
