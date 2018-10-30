@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  labels:
+    app: nginx
+data:
+  default.conf: |
+    server {
+      listen 3200 default_server;
+
+      location / {
+        return 404 'EXCEPTION_404_NOT_FOUND - The server name you requested is invalid\n';
+      }
+    }
+
+    server {
+      listen 3200;
+
+      server_name www.example.com;
+
+      location / {
+        proxy_pass http://localhost:3400;
+      }
+    }
+
+    server {
+      listen 3400;
+
+      server_name localhost;
+
+      location / {
+        return 200 'You found me!\n';
+      }
+
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+  labels:
+    app: nginx
+spec:
+  type: NodePort
+  ports:
+  - port: 3200
+    protocol: TCP
+    name: http
+  selector:
+    app: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.8
+        ports:
+        - containerPort: 3200
+        - containerPort: 3400
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3200
+            httpHeaders:
+              - name: Host
+                value: www.example.com
+          initialDelaySeconds: 30
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
