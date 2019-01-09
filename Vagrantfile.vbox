@@ -8,6 +8,12 @@ servers = YAML.load_file(File.join(File.dirname(__FILE__), 'config/servers.yaml'
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
 
+  config.trigger.before :up do |trigger|
+    trigger.name = "Removing stale kube-join.sh"
+    trigger.info = "A stale kube-join.sh will prevent the nodes from joining the master"
+    trigger.run = {inline: "bash -c 'if [ -f config/kube-join.sh ]; then rm -f config/kube-join.sh; fi'"}
+  end
+
   config.vm.provider "virtualbox" do |vb|
     vb.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
   end

@@ -8,6 +8,13 @@ servers = YAML.load_file(File.join(File.dirname(__FILE__), 'config/servers.yaml'
 Vagrant.configure('2') do |config|
   config.vm.box = 'generic/ubuntu1804'
 
+  config.trigger.before :up do |trigger|
+    trigger.name = "Removing stale kube-join.sh"
+    trigger.info = "A stale kube-join.sh will prevent the nodes from joining the master"
+    trigger.run = {inline: "bash -c 'if [ -f config/kube-join.sh ]; then rm -f config/kube-join.sh; fi'"}
+  end
+
+
   servers['vagrant'].each do |name, server_config|
     config.vm.define name do |host|
       config.vm.synced_folder '.', '/vagrant', type: 'sshfs'
