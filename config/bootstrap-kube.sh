@@ -3,20 +3,20 @@
 # TODO: Support dynamic ip ranges so 10.4 doesnt need to be hard coded.
 LEAD_OCTETS=10.4
 SERVER_IP=$(ip -f inet -o addr show | grep ${LEAD_OCTETS} | awk '{split($4,a,"/");print a[1]}')
-apt install -y apt-transport-https
+apt-get install -y apt-transport-https
 
 # We are running on 18.04 (bionic) but there is not currently a kubernetes repo for it. Using xenial for now.
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
 deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
-apt update
+apt-get update
 
 # https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
 # Ensure docker is installed
-apt install -y docker.io jq
+apt-get install -y docker.io jq
 # Install k8s packages. kubelet will fail to start on the nodes until the master is configured.
-apt install -y kubelet kubeadm kubectl kubernetes-cni ipvsadm || true
+apt-get install -y kubelet kubeadm kubectl kubernetes-cni ipvsadm || true
 modprobe ip_vs ip_vs_rr ip_vs_wrr ip_vs_sh
 echo "KUBELET_EXTRA_ARGS=--node-ip=${SERVER_IP}" > /etc/default/kubelet
 systemctl enable docker
